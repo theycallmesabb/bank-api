@@ -19,16 +19,16 @@ import java.util.Map;
 @RestController
 public class BankingController {
 
-    private final BankingService bankingService;
+    private final BankingService bankservice;
 
     public BankingController(BankingService bankingService) {
-        this.bankingService = bankingService;
+        this.bankservice = bankingService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            boolean success = bankingService.registerUser(request.getUsername(), request.getPassword());
+            boolean success = bankservice.registerUser(request.getUsername(), request.getPassword());
             
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -48,7 +48,7 @@ public class BankingController {
     public ResponseEntity<?> fundAccount(@Valid @RequestBody FundRequest request, Authentication auth) {
         try {
             String username = auth.getName();
-            Double newBalance = bankingService.fundAccount(username, request.getAmt());
+            Double newBalance = bankservice.fundAccount(username, request.getAmt());
             return ResponseEntity.ok(new BalanceResponse(newBalance));
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -61,7 +61,7 @@ public class BankingController {
     public ResponseEntity<?> payUser(@Valid @RequestBody PaymentRequest request, Authentication auth) {
         try {
             String username = auth.getName();
-            Double newBalance = bankingService.payUser(username, request.getTo(), request.getAmt());
+            Double newBalance = bankservice.payUser(username, request.getTo(), request.getAmt());
             return ResponseEntity.ok(new BalanceResponse(newBalance));
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -82,7 +82,7 @@ public class BankingController {
     public ResponseEntity<?> getBalance(@RequestParam(required = false) String currency, Authentication auth) {
         try {
             String username = auth.getName();
-            Double balance = bankingService.getBalance(username, currency);
+            Double balance = bankservice.getBalance(username, currency);
             return ResponseEntity.ok(new BalanceResponse(balance));
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -95,7 +95,7 @@ public class BankingController {
     public ResponseEntity<?> getStatement(Authentication auth) {
         try {
             String username = auth.getName();
-            List<TransactionResponse> transactions = bankingService.getTransactionHistory(username);
+            List<TransactionResponse> transactions = bankservice.getTransactionHistory(username);
             return ResponseEntity.ok(transactions);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
